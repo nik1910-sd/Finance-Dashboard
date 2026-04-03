@@ -1,0 +1,79 @@
+### Login as Admin (Run this first, copy the returned token)
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+> {% client.global.set("admin_token", response.body.token); %}
+
+### Login as Analyst
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "analyst",
+  "password": "analyst"
+}
+
+> {% client.global.set("analyst_token", response.body.token); %}
+
+### Login as Viewer
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "viewer",
+  "password": "viewer"
+}
+
+> {% client.global.set("viewer_token", response.body.token); %}
+
+### Create an Income Record (Admin Only)
+POST http://localhost:8080/api/records
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "amount": 1000.50,
+  "type": "INCOME",
+  "category": "Salary",
+  "date": "2026-04-01T10:00:00",
+  "description": "April Salary"
+}
+
+### Create an Expense Record (Admin Only)
+POST http://localhost:8080/api/records
+Authorization: Bearer {{admin_token}}
+Content-Type: application/json
+
+{
+  "amount": 250.00,
+  "type": "EXPENSE",
+  "category": "Groceries",
+  "date": "2026-04-02T10:00:00",
+  "description": "Weekly Groceries"
+}
+
+### Create Record as Analyst (Should Fail - 403 Forbidden)
+POST http://localhost:8080/api/records
+Authorization: Bearer {{analyst_token}}
+Content-Type: application/json
+
+{
+  "amount": 500.00,
+  "type": "INCOME",
+  "category": "Freelance",
+  "date": "2026-04-03T10:00:00",
+  "description": "Freelance work"
+}
+
+### View All Records (Admin or Analyst)
+GET http://localhost:8080/api/records
+Authorization: Bearer {{analyst_token}}
+
+### View Dashboard Summary (Available to ALL authenticated users)
+GET http://localhost:8080/api/dashboard/summary
+Authorization: Bearer {{viewer_token}}
